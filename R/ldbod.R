@@ -29,9 +29,9 @@
 #'
 #' All kNN computations are carried out using the nn2() function from the RANN package. Multivariate t densities are
 #' computed using the dmt() function from the mnormt package.  Refer to specific packages for more details.  Note: all
-#' neighborhoods are strickly of size k; therefore, the algorithms for LOP, LDF, and RKOF are not exact implementations, but
+#' neighborhoods are strickly of size k; therefore, the algorithms for LOF, LDF, and RKOF are not exact implementations, but
 #' algorithms are similiar for most situation and are equivalent when distance to k-th nearest neighbor is unique.  If there are many
-#' many duplicate data points, then implementation of algorithms could lead to dramatically different (positive or negative) results than those that allow
+#' duplicate data points, then implementation of algorithms could lead to dramatically different (positive or negative) results than those that allow
 #' neighborhood sizes larger than k, especially if k is relatively small.  Removing duplicates is recommended before computing
 #' outlier scores unless there is good reason to keep them.
 #'
@@ -66,14 +66,14 @@
 #' @references M. M. Breunig, H-P. Kriegel, R.T. Ng, and J. Sander (2000). LOF: Identifying density-based local outliers.  In Proc. of ACM
 #' International Conference on Knowledge Discovery and Data Mining, 93-104.
 #'
-#' L. J. Latecki, A. Lazarevic, and D. Pokrajac (2007). Outlier Detection with kernel density funcions.  In Proc. of Machine Learning and Data
+#' L. J. Latecki, A. Lazarevic, and D. Pokrajac (2007). Outlier Detection with kernel density functions.  In Proc. of Machine Learning and Data
 #' Mining in Pattern Recognition, 61-75
 #'
 #' J. Gao, W. Hu, Z. Zhang, X. Zhang, and O. Wu (2011). RKOF: Robust kernel-based local outlier detection. In Proc. of Advances in Knowledge Discovery and
 #' Data Mining, 270-283.
 #'
-#' K. Williams (2016).  Local parametric density-based outlier deteciton and ensemble learning with application to malware detection. (Unpublished doctoral dissertation).
-#' The University of Texas at San Antonio, San Antonio, TX.
+#' K. T. Williams (2016).  Local parametric density-based outlier deteciton and ensemble learning with application to malware detection. PhD Dissertation.
+#' The University of Texas at San Antonio.
 #' @examples
 #' # 500 x 2 data matrix
 #' X <- matrix(rnorm(1000),500,2)
@@ -139,7 +139,7 @@ ldbod <- function(X, k = c(10,20), nsub = nrow(X), method = c('lof','ldf','rkof'
   # check max k less than than nsub-1
   kmax <-  max(k)
   len.k <- length(k)
-  if(kmax > nsub - 1 ){ stop('k is greater than nsub') }
+  if(kmax > nsub - 1 ){ stop('k is greater than or equal to nsub') }
 
   if(is.null(nsub)) (nsub <- nrow(X))
 
@@ -148,7 +148,7 @@ ldbod <- function(X, k = c(10,20), nsub = nrow(X), method = c('lof','ldf','rkof'
   len.k <- length(k)
 
 
-  if(kmax > nsub - 1 ) stop('k is greater than nsub')
+  if(kmax > nsub -1) stop('k is greater than or equal to nsub')
 
   if(min(k) < 2 ) stop('k must be greater than 1')
 
@@ -259,7 +259,7 @@ ldbod <- function(X, k = c(10,20), nsub = nrow(X), method = c('lof','ldf','rkof'
       if('lof'%in%method){
 
         # compute local reachability density for each point in X
-        lrd <- 1/(apply(reach_dist_matrix_test,1,mean)+1e-200)
+        lrd <- 1/(apply(reach_dist_matrix_test,1,mean)+1e-198)
 
         # compute local outlier factor for each point in X
         lof <- apply(knn_ids[,1:kk],1,function(x)mean(lrd[sub_sample_ids[x]]))/lrd
@@ -281,7 +281,7 @@ ldbod <- function(X, k = c(10,20), nsub = nrow(X), method = c('lof','ldf','rkof'
 
         lde <- sapply(1:n,function(id){
                   mean(1/((2*pi)^(p/2))*1/(h*dist_k[sub_sample_ids[knn_ids[id,1:kk]]])^p*
-                  exp(-(.5*reach_dist_matrix_test[id,]^2)/(h*dist_k[sub_sample_ids[knn_ids[id,1:kk]]])^2))+1e-200
+                  exp(-(.5*reach_dist_matrix_test[id,]^2)/(h*dist_k[sub_sample_ids[knn_ids[id,1:kk]]])^2))+1e-198
         })
 
         ldf <- sapply(1:n,function(id){
@@ -316,7 +316,7 @@ ldbod <- function(X, k = c(10,20), nsub = nrow(X), method = c('lof','ldf','rkof'
       kde <-  sapply(1:n, function(id){
 
         mean(1/(2*pi)^(p/2)*1/(C*dist_k[sub_sample_ids[knn_ids[id,1:kk]]]^alpha)^2*
-               exp(-.5*knn_dist_matrix[id,1:kk]^2/(C*dist_k[sub_sample_ids[knn_ids[id,1:kk]]]^alpha)))+1e-200
+               exp(-.5*knn_dist_matrix[id,1:kk]^2/(C*dist_k[sub_sample_ids[knn_ids[id,1:kk]]]^alpha)))+1e-198
 
       })
 
@@ -402,7 +402,7 @@ ldbod <- function(X, k = c(10,20), nsub = nrow(X), method = c('lof','ldf','rkof'
 
 
           # compute multivaritae t density with degrees of freedom v
-          density = mnormt::dmt(x,mean=center,S=scatter,df=v)+1e-200
+          density = mnormt::dmt(x,mean=center,S=scatter,df=v)+1e-198
 
         })
 
