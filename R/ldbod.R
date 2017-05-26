@@ -35,7 +35,7 @@
 #' neighborhood sizes larger than k, especially if k is relatively small.  Removing duplicates is recommended before computing
 #' outlier scores unless there is good reason to keep them.
 #'
-#' The algorithm can be used to compute an ensemble of unsupervised outlier scores by using multiple k values
+#' The algorithm can be used to compute an ensemble of outlier scores by using multiple k values
 #' and/or iterating over multiple subsamples.
 #'
 #'
@@ -316,7 +316,7 @@ ldbod <- function(X, k = c(10,20), nsub = nrow(X), method = c('lof','ldf','rkof'
       kde <-  sapply(1:n, function(id){
 
         mean(1/(2*pi)^(p/2)*1/(C*dist_k[sub_sample_ids[knn_ids[id,1:kk]]]^alpha)^2*
-               exp(-.5*knn_dist_matrix[id,1:kk]^2/(C*dist_k[sub_sample_ids[knn_ids[id,1:kk]]]^alpha)))+1e-198
+               exp(-.5*knn_dist_matrix[id,1:kk]^2/(C*dist_k[sub_sample_ids[knn_ids[id,1:kk]]]^alpha)^2))+1e-198
 
       })
 
